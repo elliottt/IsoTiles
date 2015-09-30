@@ -17,14 +17,10 @@ type TestGame() as x =
 
     override x.Initialize () =
         sprites <- new SpriteBatch(x.GraphicsDevice)
-        printfn "initialized!"
         base.Initialize()
 
     override x.LoadContent () =
-        do printfn "loading content!"
-           printfn "i'm at %s" (System.IO.Directory.GetCurrentDirectory ())
-           printfn "content loaded from %s" x.Content.RootDirectory
-           tiles <- loadTiles x.Content "cityTiles_sheet.xml"
+        do tiles <- loadTiles x.Content "cityTiles_sheet.xml"
            grid  <- mkGrid tiles 2 3
 
         let tile = getTile tiles "cityTiles_001.png"
