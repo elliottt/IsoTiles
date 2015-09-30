@@ -2,6 +2,7 @@
 // See the 'F# Tutorial' project for more help.
 
 open IsoTiles.Tiles
+open IsoTiles.Camera
 
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
@@ -14,6 +15,7 @@ type TestGame() as x =
     let mutable tiles   = emptyTiles
     let mutable grid    = Unchecked.defaultof<grid>
     let mutable rect    = Unchecked.defaultof<Texture2D>
+    let camera          = make_camera ()
 
     override x.Initialize () =
         sprites <- new SpriteBatch(x.GraphicsDevice)
@@ -32,7 +34,9 @@ type TestGame() as x =
 
     override x.Draw _ =
         x.GraphicsDevice.Clear(Color.CornflowerBlue)
-        sprites.Begin()
+        sprites.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
+                DepthStencilState.None, RasterizerState.CullCounterClockwise,
+                null, transform_matrix camera)
         renderGrid sprites grid 10.0f 10.0f
         sprites.End()
 

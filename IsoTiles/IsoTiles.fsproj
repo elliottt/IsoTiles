@@ -53,6 +53,8 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Tiles.fsi" />
     <Compile Include="Tiles.fs" />
+    <Compile Include="Camera.fsi" />
+    <Compile Include="Camera.fs" />
     <Content Include="packages.config" />
     <Content Include="app.config" />
   </ItemGroup>
