@@ -25,7 +25,7 @@ type TestGame() as x =
            printfn "i'm at %s" (System.IO.Directory.GetCurrentDirectory ())
            printfn "content loaded from %s" x.Content.RootDirectory
            tiles <- loadTiles x.Content "cityTiles_sheet.xml"
-           grid  <- mkGrid tiles 2 3 "cityTiles_000.png"
+           grid  <- mkGrid tiles 2 3
 
         let tile = getTile tiles "cityTiles_001.png"
         do setCell grid 0 0 tile

@@ -20,10 +20,13 @@ val tryGetTile : tiles -> tile_name -> tile option
 
 type grid
 
-val mkGrid : tiles -> int -> int -> tile_name -> grid
+val mkGrid : tiles -> int -> int -> grid
 
-val setCell : grid -> int -> int -> tile -> unit
+val setCell       : grid -> int -> int -> tile -> unit
+val setCellByName : grid -> int -> int -> tile_name -> unit
 
-val getCell : grid -> int -> int -> tile
+
+val clearCell : grid -> int -> int -> unit
+val getCell   : grid -> int -> int -> tile option
 
 val renderGrid : SpriteBatch -> grid -> float32 -> float32 -> unit

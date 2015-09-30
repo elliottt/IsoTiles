@@ -72,16 +72,21 @@ let tryGetTile tiles str = Map.tryFind str tiles.tiles
 
 type grid = {
     tiles: tiles;
-    grid: tile[,];
+    grid: tile option [,];
 }
 
-let mkGrid tiles width height name =
-    let tile = getTile tiles name
-    let grid = Array2D.create width height tile
+let mkGrid tiles width height =
+    let grid = Array2D.create width height None
     { tiles = tiles; grid = grid }
 
+let clearCell grid x y =
+    Array2D.set grid.grid x y None
+
 let setCell grid x y tile =
-    Array2D.set grid.grid x y tile
+    Array2D.set grid.grid x y (Some tile)
+
+let setCellByName grid x y tile_name =
+    Array2D.set grid.grid x y (Some (getTile grid.tiles tile_name))
 
 let getCell grid x y =
     Array2D.get grid.grid x y
@@ -103,10 +108,9 @@ let renderGrid (sprites:SpriteBatch) grid (grid_x:float32) (grid_y:float32) =
     // iterate down through the rows, back to front
     for y = Array2D.base2 grid.grid to yw do
         for x = xw downto Array2D.base1 grid.grid do
-            // adjust x to be relative to the top-right corner of the grid
-            let x'       = xw - x
-            let screen_x = x0 - float32 (x' - y) * w2
-            let screen_y = y0 + float32 (x' + y) * h2
-
-            let tile     = getCell grid x y
-            renderTile sprites (getCell grid x y) screen_x screen_y
+            getCell grid x y |> Option.iter (fun tile ->
+                // adjust x to be relative to the top-right corner of the grid
+                let x'       = xw - x
+                let screen_x = x0 - float32 (x' - y) * w2
+                let screen_y = y0 + float32 (x' + y) * h2
+                renderTile sprites tile screen_x screen_y)
