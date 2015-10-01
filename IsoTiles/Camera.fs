@@ -17,6 +17,9 @@ let make_camera () =
       zoom       = Vector2.One;
       rotation   = 0.0f; }
 
+let set_x camera x = camera.position.X <- x
+let set_y camera y = camera.position.Y <- y
+
 (**
  * Given a camera, produce a transformation matrix suitable for use with
  * SpriteBatch.Begin()

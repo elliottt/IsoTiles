@@ -29,8 +29,8 @@ type TestGame() as x =
         do setCell grid 0 0 tile
            setCell grid 1 0 tile
 
-    override x.Update _ =
-        ()
+    override x.Update time =
+        set_x camera (MathHelper.Lerp(0.0f, -200.0f, float32 time.TotalGameTime.Milliseconds / 1000.f))
 
     override x.Draw _ =
         x.GraphicsDevice.Clear(Color.CornflowerBlue)
