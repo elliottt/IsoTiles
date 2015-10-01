@@ -30,7 +30,10 @@ type TestGame() as x =
            setCell grid 1 0 tile
 
     override x.Update time =
-        set_x camera (MathHelper.Lerp(0.0f, -200.0f, float32 time.TotalGameTime.Milliseconds / 1000.f))
+        let amount = float32 time.TotalGameTime.Milliseconds / 1000.0f
+        do  camera |> set_x   (MathHelper.Lerp(0.0f, -200.0f, amount))
+                   |> ignore
+        ()
 
     override x.Draw _ =
         x.GraphicsDevice.Clear(Color.CornflowerBlue)

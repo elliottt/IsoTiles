@@ -17,8 +17,15 @@ let make_camera () =
       zoom       = Vector2.One;
       rotation   = 0.0f; }
 
-let set_x camera x = camera.position.X <- x
-let set_y camera y = camera.position.Y <- y
+let set_x   x   camera = camera.position.X <- x;   camera
+let set_y   y   camera = camera.position.Y <- y;   camera
+let set_rot rot camera = camera.rotation   <- rot; camera
+
+let set_zoom z camera =
+    camera.zoom.X <- z;
+    camera.zoom.Y <- z;
+    camera
+       
 
 (**
  * Given a camera, produce a transformation matrix suitable for use with
