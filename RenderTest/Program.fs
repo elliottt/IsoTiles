@@ -12,35 +12,33 @@ type TestGame() as x =
 
     let manager = new GraphicsDeviceManager(x)
     let mutable sprites = Unchecked.defaultof<SpriteBatch>
-    let mutable tiles   = emptyTiles
-    let mutable grid    = Unchecked.defaultof<grid>
+    let mutable tiles   = Unchecked.defaultof<Tiles>
+    let mutable grid    = Unchecked.defaultof<IsoGrid>
     let mutable rect    = Unchecked.defaultof<Texture2D>
-    let camera          = make_camera ()
+    let camera          = new Camera()
 
     override x.Initialize () =
         sprites <- new SpriteBatch(x.GraphicsDevice)
         base.Initialize()
 
     override x.LoadContent () =
-        do tiles <- loadTiles x.Content "cityTiles_sheet.xml"
-           grid  <- mkGrid tiles 2 3
+        do tiles <- new Tiles(x.Content,"cityTiles_sheet.xml")
+           grid  <- new IsoGrid(tiles,2,3)
 
-        let tile = getTile tiles "cityTiles_001.png"
-        do setCell grid 0 0 tile
-           setCell grid 1 0 tile
+        let tile = tiles.GetTile "cityTiles_001.png"
+        do  set_cell grid 0 0 tile
+            set_cell grid 1 0 tile
 
     override x.Update time =
         let amount = float32 time.TotalGameTime.Milliseconds / 1000.0f
-        do  camera |> set_x   (MathHelper.Lerp(0.0f, -200.0f, amount))
-                   |> ignore
-        ()
+        do  camera.X <- (MathHelper.Lerp(0.0f, -200.0f, amount))
 
     override x.Draw _ =
         x.GraphicsDevice.Clear(Color.CornflowerBlue)
         sprites.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
                 DepthStencilState.None, RasterizerState.CullCounterClockwise,
-                null, transform_matrix camera)
-        renderGrid sprites grid 10.0f 10.0f
+                null, camera.TransformMatrix)
+        render grid sprites 10.0f 10.0f
         sprites.End()
 
 let game = new TestGame() in

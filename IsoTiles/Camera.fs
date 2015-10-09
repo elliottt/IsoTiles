@@ -2,39 +2,39 @@
 
 open Microsoft.Xna.Framework
 
-type camera = {
-    mutable position  : Vector2;
-    mutable offset    : Vector2;
-    mutable screen_pos: Vector2;
-    mutable zoom      : Vector2;
-    mutable rotation  : float32;
-}
+type Camera() =
+    let mutable position  = Vector2.Zero
+    let mutable offset    = Vector2.Zero
+    let mutable screen_pos= Vector2.Zero
+    let mutable zoom      = Vector2.One
+    let mutable rotation  = 0.0f
 
-let make_camera () =
-    { position   = Vector2.Zero;
-      offset     = Vector2.Zero;
-      screen_pos = Vector2.Zero;
-      zoom       = Vector2.One;
-      rotation   = 0.0f; }
+    member __.X
+        with get () = position.X
+        and  set x  = position.X <- x
 
-let set_x   x   camera = camera.position.X <- x;   camera
-let set_y   y   camera = camera.position.Y <- y;   camera
-let set_rot rot camera = camera.rotation   <- rot; camera
+    member __.Y
+        with get () = position.Y
+        and  set y  = position.Y <- y
 
-let set_zoom z camera =
-    camera.zoom.X <- z;
-    camera.zoom.Y <- z;
-    camera
-       
+    member __.Rot
+        with get () = rotation
+        and  set r  = rotation <- r
 
-(**
- * Given a camera, produce a transformation matrix suitable for use with
- * SpriteBatch.Begin()
- *)
-let transform_matrix camera =
-    let rot_origin = Vector3(camera.position + camera.offset, 0.0f)
-    let screen_pos = Vector3(camera.screen_pos, 0.0f)
-    System.Nullable<Matrix>(Matrix.CreateTranslation(- rot_origin)
-        * Matrix.CreateScale(camera.zoom.X, camera.zoom.Y, 1.0f)
-        * Matrix.CreateRotationZ(camera.rotation)
-        * Matrix.CreateTranslation(screen_pos))
+    member __.Zoom
+        with set z =
+                do zoom.X <- z
+                   zoom.Y <- z
+
+    (**
+     * Given a camera, produce a transformation matrix suitable for use with
+     * SpriteBatch.Begin()
+     *)
+    member __.TransformMatrix
+        with get () =
+            let rot_origin = Vector3(position + offset, 0.0f)
+            let screen_pos = Vector3(screen_pos, 0.0f)
+            System.Nullable<Matrix>(Matrix.CreateTranslation(- rot_origin)
+                * Matrix.CreateScale(zoom.X, zoom.Y, 1.0f)
+                * Matrix.CreateRotationZ(rotation)
+                * Matrix.CreateTranslation(screen_pos))

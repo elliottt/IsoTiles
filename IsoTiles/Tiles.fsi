@@ -5,28 +5,34 @@ open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
 
+[<Interface>]
+type IRender =
+    abstract Render : SpriteBatch -> float32 -> float32 -> unit
+
+val render : IRender -> SpriteBatch -> float32 -> float32-> unit
+
 type tile_name = string
 
-type tile
+[<Class>]
+type Tile =
+    interface IRender
 
-val renderTile : SpriteBatch -> tile -> float32 -> float32 -> unit
+type Tiles =
+    new : ContentManager * string -> Tiles
+    member GetTile    : tile_name -> Tile
+    member TryGetTile : tile_name -> Tile option
 
-type tiles
+[<Interface>]
+type IGrid =
+    abstract SetCell   : int -> int -> Tile -> unit
+    abstract GetCell   : int -> int -> Tile option
+    abstract ClearCell : int -> int -> unit
 
-val loadTiles : ContentManager -> string -> tiles
-val emptyTiles : tiles
-val getTile : tiles -> tile_name -> tile
-val tryGetTile : tiles -> tile_name -> tile option
+val set_cell   : IGrid -> int -> int -> Tile -> unit
+val get_cell   : IGrid -> int -> int -> Tile option
+val clear_cell : IGrid -> int -> int -> unit
 
-type grid
-
-val mkGrid : tiles -> int -> int -> grid
-
-val setCell       : grid -> int -> int -> tile -> unit
-val setCellByName : grid -> int -> int -> tile_name -> unit
-
-
-val clearCell : grid -> int -> int -> unit
-val getCell   : grid -> int -> int -> tile option
-
-val renderGrid : SpriteBatch -> grid -> float32 -> float32 -> unit
+type IsoGrid =
+    new : Tiles * int * int -> IsoGrid
+    interface IGrid
+    interface IRender

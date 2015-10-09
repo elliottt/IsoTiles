@@ -9,26 +9,10 @@ open Microsoft.Xna.Framework.Graphics
 
 type tile_name = string
 
-type tile = {
-    width:   float32;
-    height:  float32;
-    offsetX: float32;
-    offsetY: float32;
-    texture: Texture2D;
-    sourceRect: Nullable<Rectangle>;
-}
+type IRender =
+    abstract Render : SpriteBatch -> float32-> float32 -> unit
 
-(* Render a tile to the given coordinate *)
-let renderTile (sprites : SpriteBatch) tile x y =
-    let real_x = x + tile.offsetX
-    let real_y = y + tile.offsetY
-    sprites.Draw(tile.texture,Vector2 (real_x,real_y), tile.sourceRect, Color.White)
-
-type tiles = {
-    tiles:  Map<string,tile>
-    width:  float32;
-    height: float32;
-}
+let render (r : IRender) sprites x y = r.Render sprites x y
 
 type TextureAtlas = XmlProvider<"""
 <TextureAtlas imagePath="foo.png" width="100" height="100">
@@ -39,78 +23,75 @@ type TextureAtlas = XmlProvider<"""
 </TextureAtlas>
 """>
 
-let emptyTiles = { tiles = Map.empty; width = 0.0f; height = 0.0f }
-
 let option (def:'b) (f:'a -> 'b) (opt:'a option) : 'b =
     match opt with
     | Some a -> f a
     | None   -> def
 
-let loadTile width height tex (child : TextureAtlas.SubTexture) =
-    { width   = width;
-      height  = height;
-      offsetX = option 0.0f float32 child.OffsetX;
-      offsetY = option 0.0f float32 child.OffsetY;
-      texture = tex;
-      sourceRect = Nullable<Rectangle>(Rectangle(int child.X,int child.Y,int child.Width,int child.Height)) }
+type Tile(width, height, tex : Texture2D, sub : TextureAtlas.SubTexture) =
+    let offsetX = option 0.0f float32 sub.OffsetX
+    let offsetY = option 0.0f float32 sub.OffsetY
+    let texture = tex
+    let sourceRect = Nullable<Rectangle>(Rectangle(int sub.X,int sub.Y,int sub.Width,int sub.Height))
 
-(* NOTE: null can creep into the sequene expression that defines tiles *)
-let loadTiles (content : ContentManager) (path:string) =
+    interface IRender with
+        member __.Render sprites x y =
+            let real_x = x + offsetX
+            let real_y = y + offsetY
+            sprites.Draw(tex,Vector2 (real_x,real_y), sourceRect, Color.White)
+
+type Tiles(content : ContentManager, path : string) =
     let atlas = TextureAtlas.Load(new IO.StreamReader(path))
     let img   = content.Load<Texture2D>(atlas.ImagePath)
     let fw    = float32 atlas.Width
     let fh    = float32 atlas.Height
     let tiles = seq { for child in atlas.SubTextures do
-                          let tile = loadTile fw fh img child
-                          yield child.Name, tile }
-    { tiles = Map.ofSeq tiles; width = fw; height = fh }
+                          let tile = new Tile(fw,fh,img,child)
+                          yield child.Name, tile } |> Map.ofSeq
 
+    member __.Width  with get () = fw
+    member __.Height with get () = fh
 
-let getTile tiles str = Map.find str tiles.tiles
+    member __.GetTile str = Map.find str tiles
+    member __.TryGetTile str = Map.tryFind str tiles
 
-let tryGetTile tiles str = Map.tryFind str tiles.tiles
+type IGrid =
+    abstract SetCell   : int -> int -> Tile -> unit
+    abstract GetCell   : int -> int -> Tile option
+    abstract ClearCell : int -> int -> unit
 
-type grid = {
-    tiles: tiles;
-    grid: tile option [,];
-}
+let set_cell   (g : IGrid) x y t = g.SetCell   x y t
+let get_cell   (g : IGrid) x y   = g.GetCell   x y
+let clear_cell (g : IGrid) x y   = g.ClearCell x y
 
-let mkGrid tiles width height =
-    let grid = Array2D.create width height None
-    { tiles = tiles; grid = grid }
+type IsoGrid(tiles : Tiles, width, height) =
+    let grid = Array2D.create width height (None : Tile option)
 
-let clearCell grid x y =
-    Array2D.set grid.grid x y None
+    interface IGrid with
+        member __.SetCell   x y tile = Array2D.set grid x y (Some tile)
+        member __.GetCell   x y      = Array2D.get grid x y
+        member __.ClearCell x y      = Array2D.set grid x y None
 
-let setCell grid x y tile =
-    Array2D.set grid.grid x y (Some tile)
+    interface IRender with
+        member __.Render sprites grid_x grid_y =
 
-let setCellByName grid x y tile_name =
-    Array2D.set grid.grid x y (Some (getTile grid.tiles tile_name))
+            // cache some grid sizing information
+            let w2 = tiles.Width  / 2.0f
+            let h2 = tiles.Height / 2.0f
+            let xw = Array2D.length1 grid - 1
+            let fxw = float32 xw
+            let yw = Array2D.length2 grid - 1
 
-let getCell grid x y =
-    Array2D.get grid.grid x y
+            // figure out where the top of the diamond will be
+            let x0 = grid_x + w2 * float32 (Array2D.length1 grid) - w2
+            let y0 = grid_y
 
-(* Draw top-right to bottom-left *)
-let renderGrid (sprites:SpriteBatch) grid (grid_x:float32) (grid_y:float32) =
-
-    // cache some grid sizing information
-    let w2 = grid.tiles.width  / 2.0f
-    let h2 = grid.tiles.height / 2.0f
-    let xw = Array2D.length1 grid.grid - 1
-    let fxw = float32 xw
-    let yw = Array2D.length2 grid.grid - 1
-
-    // figure out where the top of the diamond will be
-    let x0 = grid_x + w2 * float32 (Array2D.length1 grid.grid) - w2
-    let y0 = grid_y
-
-    // iterate down through the rows, back to front
-    for y = Array2D.base2 grid.grid to yw do
-        for x = xw downto Array2D.base1 grid.grid do
-            getCell grid x y |> Option.iter (fun tile ->
-                // adjust x to be relative to the top-right corner of the grid
-                let x'       = xw - x
-                let screen_x = x0 - float32 (x' - y) * w2
-                let screen_y = y0 + float32 (x' + y) * h2
-                renderTile sprites tile screen_x screen_y)
+            // iterate down through the rows, back to front
+            for y = Array2D.base2 grid to yw do
+                for x = xw downto Array2D.base1 grid do
+                    Array2D.get grid x y |> Option.iter (fun tile ->
+                        // adjust x to be relative to the top-right corner of the grid
+                        let x'       = xw - x
+                        let screen_x = x0 - float32 (x' - y) * w2
+                        let screen_y = y0 + float32 (x' + y) * h2
+                        render tile sprites screen_x screen_y)

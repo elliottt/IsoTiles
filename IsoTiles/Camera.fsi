@@ -4,13 +4,9 @@ module IsoTiles.Camera
 open Microsoft.Xna.Framework
 open System
 
-type camera
-
-val make_camera      : unit   -> camera
-val transform_matrix : camera -> Nullable<Matrix>
-
-val set_x   : float32 -> camera -> camera
-val set_y   : float32 -> camera -> camera
-val set_rot : float32 -> camera -> camera
-
-val set_zoom: float32 -> camera -> camera
+type Camera =
+    new : unit -> Camera
+    member X : float32 with get, set
+    member Y : float32 with get, set
+    member Zoom : float32 with set
+    member TransformMatrix : Nullable<Matrix> with get
