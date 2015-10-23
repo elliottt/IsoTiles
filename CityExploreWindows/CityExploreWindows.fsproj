@@ -5,14 +5,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>6d14fcb4-4c7d-4efa-8d63-d6c6fbed4756</ProjectGuid>
+    <ProjectGuid>ae9825bf-a51f-4370-aed6-5140e9ea38f7</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>RenderTest</RootNamespace>
-    <AssemblyName>RenderTest</AssemblyName>
+    <RootNamespace>CityExploreWindows</RootNamespace>
+    <AssemblyName>CityExploreWindows</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
-    <Name>RenderTest</Name>
+    <Name>CityExploreWindows</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,8 +23,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Debug\RenderTest.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Debug\CityExploreWindows.XML</DocumentationFile>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,7 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Release\RenderTest.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\CityExploreWindows.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -58,12 +58,6 @@
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
-    <Content Include="cityTiles_sheet.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="cityTiles_sheet.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
@@ -77,8 +71,11 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\CityExplore\CityExplore.fsproj">
+      <Name>CityExplore</Name>
+      <Project>{c9e3dde8-92f2-4bb9-a0fa-83d55ef5d24a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\IsoTiles\IsoTiles.fsproj">
       <Name>IsoTiles</Name>
       <Project>{8f0390db-6f8f-456f-9e96-fef7645be432}</Project>
