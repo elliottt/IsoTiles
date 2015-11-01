@@ -1,5 +1,7 @@
 ﻿module IsoTiles.Tiles
 
+open IsoTiles.Base
+
 open System
 open FSharp.Data
 open Microsoft.Xna.Framework
@@ -8,11 +10,6 @@ open Microsoft.Xna.Framework.Graphics
 
 
 type tile_name = string
-
-type IRender =
-    abstract Render : SpriteBatch -> float32-> float32 -> unit
-
-let render (r : IRender) sprites x y = r.Render sprites x y
 
 type TextureAtlas = XmlProvider<"""
 <TextureAtlas imagePath="foo.png" width="100" height="100">

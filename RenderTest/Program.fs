@@ -1,6 +1,7 @@
 ﻿// Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
 
+open IsoTiles.Base
 open IsoTiles.Tiles
 open IsoTiles.Camera
 

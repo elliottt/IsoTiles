@@ -1,15 +1,11 @@
 ﻿module IsoTiles.Tiles
 
+open IsoTiles.Base
+
 open System
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
-
-[<Interface>]
-type IRender =
-    abstract Render : SpriteBatch -> float32 -> float32 -> unit
-
-val render : IRender -> SpriteBatch -> float32 -> float32-> unit
 
 type tile_name = string
 
