@@ -37,7 +37,8 @@ type Party () =
     member __.AddMember char =
         members <- char :: members
 
-    /// Returns the members that are flanking the current position, or None.
+    /// Returns the members that are flanking the current position, or the
+    /// empty sequence if there are none.
     member __.Flanking (pos: Position) =
         let rec FindFlanking = function
                 | n :: ns -> seq { let opposite = OppositeAbout pos (Position n)
