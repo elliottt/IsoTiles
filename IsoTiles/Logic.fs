@@ -13,8 +13,7 @@ type Character () =
     let mutable max_health = 10
 
     // position state
-    let mutable x = 0
-    let mutable y = 0
+    let mutable pos = { X=0; Y=0 }
 
     // movement state
     let mutable speed = 1
@@ -27,8 +26,30 @@ type Character () =
                              and set h  = max_health <- max_health
 
     interface IPosition with
-        member __.X with get () = x
-                     and set x' = x <- x'
+        member __.Position with get ()   = pos
+                            and set pos' = pos <- pos'
 
-        member __.Y with get () = y
-                     and set y' = y <- y'
+
+type Party () =
+
+    let mutable members = [] : Character list
+
+    member __.AddMember char =
+        members <- char :: members
+
+    /// Returns the members that are flanking the current position, or None.
+    member __.Flanking (pos: Position) =
+        let rec FindFlanking = function
+                | n :: ns -> seq { let opposite = OppositeAbout pos (Position n)
+                                   match List.tryFind (fun n' -> Position n' = opposite) ns with
+                                   | Some n' -> yield n, n'
+                                   | None    -> ()
+
+                                   yield! FindFlanking ns
+                                 }
+                | [] -> Seq.empty
+
+        let Candidate = InNeighborhood pos
+
+        in members |> List.filter (fun c -> Candidate (Position c))
+                   |> FindFlanking

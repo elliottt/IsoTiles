@@ -39,7 +39,7 @@ type TestGame() as x =
         sprites.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
                 DepthStencilState.None, RasterizerState.CullCounterClockwise,
                 null, camera.TransformMatrix)
-        render grid sprites 10.0f 10.0f
+        Render grid sprites 10.0f 10.0f
         sprites.End()
 
 let game = new TestGame() in

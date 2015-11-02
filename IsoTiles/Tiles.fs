@@ -91,4 +91,4 @@ type IsoGrid(tiles : Tiles, width, height) =
                         let x'       = xw - x
                         let screen_x = x0 - float32 (x' - y) * w2
                         let screen_y = y0 + float32 (x' + y) * h2
-                        render tile sprites screen_x screen_y)
+                        Render tile sprites screen_x screen_y)
